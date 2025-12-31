@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Explore Nepal</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- NAVIGATION BAR -->
+  <nav>
+    <div class="logo">GoNepal</div>
+
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="heritages.html">Heritages</a>
+      <a href="touristspots.html">Tourist Spots</a>
+      <a href="festivals.html">Festivals</a>
+      <a href="about.html">About</a>
+    </div>
+
+    <div class="auth-buttons">
+      <a href="#" class="login-btn">Login</a>
+      <a href="#" class="login-btn" id="logout-btn" style="display:none;">Logout</a>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <header class="hero" id="home">
+    <div class="hero-content">
+      <h1>Welcome to Nepal</h1>
+      <p>Explore the land of majestic peaks, rich culture, and timeless heritage</p>
+      <a href="#introduction" class="btn-hero">Discover More</a>
+    </div>
+  </header>
+
+  <!-- LOGIN / SIGNUP MODAL -->
+  <div id="auth-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div class="form-toggle">
+        <button id="login-tab" class="active">Login</button>
+        <button id="signup-tab">Sign Up</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="login-form" class="auth-form active">
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit" class="btn-submit">Login</button>
+        <p>Don't have an account? <span id="switch-to-signup">Sign Up</span></p>
+      </form>
+
+      <!-- SIGNUP FORM -->
+      <form id="signup-form" class="auth-form">
+        <input type="text" placeholder="Full Name" required>
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit" class="btn-submit">Sign Up</button>
+        <p>Already have an account? <span id="switch-to-login">Login</span></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT (HIDDEN UNTIL LOGIN) -->
+  <div id="main-content" style="display:none;">
+    <main>
+      <section id="introduction" class="card-section">
+        <h2>Introduction</h2>
+        <p>Nepal is a landlocked country in South Asia, bordered by India and China. It is home to Mount Everest and eight of the world's ten highest peaks. The country features diverse landscapes from the Himalayas in the north to the Terai plains in the south. Nepal is rich in multi-ethnic culture, and has numerous Buddhist and Hindu heritage sites.</p>
+      </section>
+
+      <section id="map" class="card-section">
+        <h2>Map</h2>
+        <p>Nepal is divided into 7 provinces: Province No.1, Province No.2, Bagmati Pradesh, Gandaki Pradesh, Province No.5, Karnali Pradesh, and Sudurpashchim Pradesh. Kathmandu, the capital, is the largest city and hosts multiple World Heritage Sites.</p>
+        <img src="map.jpg" alt="Nepal Map" class="image-section">
+      </section>
+
+      <section id="where" class="card-section">
+        <h2>Where is Nepal?</h2>
+        <p>Nepal is located in the Himalayas between India and China. It is renowned for its scenic beauty, cultural heritage, and adventurous trekking destinations.</p>
+        <img src="wherenepal.jpg" alt="Where is Nepal" class="image-section">
+      </section>
+    </main>
+
+    <footer>
+      <p>Designed for KCT Webwar. All rights reserved by BSc.CSIT</p>
+    </footer>
+  </div>
+
+  <!-- Success Popup -->
+  <div id="success-popup" class="popup">
+    <p id="popup-message">Success!</p>
+  </div>
+
+  <!-- SCRIPT -->
+  <script src="script.js"></script>
+
+</body>
+</html>

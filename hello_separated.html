@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Explore Nepal — GoNepal</title>
+  <meta name="description" content="Explore Nepal — mountains, culture and heritage. Redesigned modern homepage." />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style_separated.css">
+</head>
+<body>
+
+  <nav aria-label="Main navigation" id="siteNav">
+    <div class="nav-inner container">
+      <div style="display:flex; align-items:center; gap:12px; min-width:0">
+        <div class="logo" aria-hidden="false" style="flex-shrink:0">
+          <div class="mark" aria-hidden="true">GN</div>
+          <div>
+            <div>GoNepal</div>
+            <div style="font-size:11px;opacity:.86">Explore Nepal</div>
+          </div>
+        </div>
+
+        <div class="nav-links" role="navigation" aria-label="Primary" id="primaryNav">
+          <a href="hello.html">Home</a>
+          <a href="heritages.html">Heritages</a>
+          <a href="touristspots.html">Destinations</a>
+          <a href="about.html">Trekking</a>
+          <a href="festivals.html">Festivals</a>
+        </div>
+        
+      </div>
+
+      <div class="auth-buttons" role="group" aria-label="Account controls">
+        <button class="btn btn-ghost" id="themeToggle" aria-pressed="false" title="Toggle dark mode" aria-label="Toggle theme">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="#0b1220" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          Theme
+        </button>
+
+        <button class="btn btn-outline login-trigger" id="loginOpen">Login / Sign up</button>
+        <button class="btn btn-primary" id="logout-btn" style="display:none">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero container" id="home" role="banner">
+    <div class="hero-left reveal" aria-hidden="false">
+      <div class="hero-eyebrow">
+        <div class="badge">Nepal • Himalayas</div>
+      </div>
+
+      <h1 class="hero-title">Welcome to Nepal — The Roof of the World</h1>
+      <p class="hero-sub">From soaring Himalayan peaks to sacred heritage sites — explore treks, culture, and timeless landscapes. Plan your next journey responsibly and support local communities.</p>
+
+      <div class="hero-cta-row" style="margin-top:12px">
+        <button class="discover-btn" id="discoverBtn">Discover</button>
+      </div>
+    </div>
+
+    <aside class="hero-cards" aria-label="Highlights">
+      <div class="glass-card reveal">
+        <h4>Why Nepal?</h4>
+        <p>Home to Mount Everest, living cultures, and centuries-old heritage — Nepal offers adventure and serenity in one trip.</p>
+        <div class="features" aria-hidden>
+          <div class="feature"><strong>180+</strong><h5>Peaks</h5></div>
+          <div class="feature"><strong>10+</strong><h5>UNESCO sites</h5></div>
+          <div class="feature"><strong>1000+</strong><h5>Trails</h5></div>
+        </div>
+      </div>
+
+      <div class="glass-card reveal">
+        <h4>Plan With Respect</h4>
+        <p>Support local guides, stick to marked trails, and respect religious sites and customs. Leave no trace and contribute to conservation.</p>
+      </div>
+
+      <div class="hero-visual reveal" id="visual" aria-hidden="false" role="img" aria-label="Himalayan panorama">
+        <img class="mountain" src="nagar.jpg" alt="Nagar panorama" loading="lazy">
+
+        <div class="hero-caption">
+          <div>
+            <h3>Mountains. Culture. Adventure.</h3>
+            <p>Experience the Himalayas, UNESCO heritage sites, and vibrant local life.</p>
+            <div style="margin-top:10px; display:flex; gap:8px">
+              <span style="background:rgba(255,255,255,0.06);padding:6px 10px;border-radius:999px;font-weight:700;color:var(--white)">180+ Peaks</span>
+              <span style="background:rgba(255,255,255,0.04);padding:6px 10px;border-radius:999px;font-weight:700;color:var(--white)">UNESCO Sites</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </header>
+
+  <!-- MAIN -->
+  <main>
+    <!-- intro cards -->
+    <section class="grid" aria-labelledby="introduction">
+      <div class="card reveal" id="intro">
+        <h3 id="introduction">Introduction</h3>
+        <p>Nepal is a landlocked country in South Asia, bordered by India and China. It contains eight of the world's top ten highest peaks and is rich in multi-ethnic culture and heritage.</p>
+      </div>
+
+      <div class="card reveal">
+        <h3>Map & Provinces</h3>
+        <p>Nepal is divided into 7 provinces: Province No.1, Province No.2, Bagmati, Gandaki, Lumbini (Province No.5), Karnali and Sudurpashchim. Kathmandu is the capital and cultural hub.</p>
+      </div>
+
+      <div class="card reveal">
+        <h3>Where is Nepal?</h3>
+        <p>Between India and China in the Himalayas. The country features the high Himalayan region, mid hills, and lowland Terai plains.</p>
+      </div>
+    </section>
+
+    <!-- Destinations grid -->
+    <h2 style="color:var(--primary-700); margin: 10px 0 12px">Top Destinations</h2>
+    <section class="dest-grid" id="destinations" aria-label="Destinations">
+      <div class="dest reveal" style="background-image:linear-gradient(180deg, rgba(5,20,40,0.18), rgba(0,0,0,0.3)), url('ktm.jpg'); background-size:cover;">
+        <div class="overlay"><h4>Kathmandu Valley</h4><p>Heritage, temples & living culture</p></div>
+      </div>
+      <div class="dest reveal" style="background-image:linear-gradient(180deg, rgba(5,20,40,0.18), rgba(0,0,0,0.3)), url('pokhara.jpg'); background-size:cover;">
+        <div class="overlay"><h4>Pokhara</h4><p>Lakeside & Annapurna views</p></div>
+      </div>
+      <div class="dest reveal" style="background-image:linear-gradient(180deg, rgba(5,20,40,0.18), rgba(0,0,0,0.3)), url('chitwan1.jpg'); background-size:cover;">
+        <div class="overlay"><h4>Chitwan</h4><p>Wildlife safaris & jungles</p></div>
+      </div>
+      <div class="dest reveal" style="background-image:linear-gradient(180deg, rgba(5,20,40,0.18), rgba(0,0,0,0.3)), url('mteverest.jpg'); background-size:cover;">
+        <div class="overlay"><h4>Everest Region</h4><p>Trekking & high-altitude vistas</p></div>
+      </div>
+    </section>
+
+    <!-- Top Trekking -->
+    <h2 style="color:var(--primary-700); margin: 18px 0 12px">Top Trekking Available in Nepal</h2>
+    <section class="dest-grid" id="trekking" aria-label="Top trekking">
+      <div class="trek reveal" style="background-image:linear-gradient(180deg, rgba(5,20,40,0.18), rgba(0,0,0,0.3)), url('annapurna.jpg'); background-size:cover;">
+        <div class="overlay"><h4>Annapurna Circuit</h4><p>Classic circuit with diverse scenery & cultural villages</p></div>
+      </div>
+      <div class="trek reveal" style="background-image:linear-gradient(180deg, rgba(5,20,40,0.18), rgba(0,0,0,0.3)), url('everestbase.jpg'); background-size:cover;">
+        <div class="overlay"><h4>Everest Base Camp</h4><p>Iconic trek to the foot of the world's highest peak</p></div>
+      </div>
+      <div class="trek reveal" style="background-image:linear-gradient(180deg, rgba(5,20,40,0.18), rgba(0,0,0,0.3)), url('langtang.jpg'); background-size:cover;">
+        <div class="overlay"><h4>Langtang Valley</h4><p>Close-to-Kathmandu trek with glacier views and Tamang culture</p></div>
+      </div>
+      <div class="trek reveal" style="background-image:linear-gradient(180deg, rgba(5,20,40,0.18), rgba(0,0,0,0.3)), url('dolpo.jpg'); background-size:cover;">
+        <div class="overlay"><h4>Upper Dolpo</h4><p>Remote high-altitude plateau, rich culture and solitude</p></div>
+      </div>
+    </section>
+
+    <!-- Top Adventures -->
+    <h2 style="color:var(--primary-700); margin: 18px 0 12px">Top Adventures in Nepal</h2>
+    <section class="dest-grid" id="adventures" aria-label="Top adventures">
+      <div class="adventure reveal" style="background-image:linear-gradient(180deg, rgba(5,20,40,0.18), rgba(0,0,0,0.3)), url('paragliding.jpg'); background-size:cover;">
+        <div class="overlay"><h4>Paragliding</h4><p>Soar over Pokhara's lakeside with panoramic mountain views</p></div>
+      </div>
+      <div class="adventure reveal" style="background-image:linear-gradient(180deg, rgba(5,20,40,0.18), rgba(0,0,0,0.3)), url('bungeejump.jpg'); background-size:cover;">
+        <div class="overlay"><h4>Bungee Jumping</h4><p>Adrenaline-pumping jumps over deep valleys and rivers</p></div>
+      </div>
+      <div class="adventure reveal" style="background-image:linear-gradient(180deg, rgba(5,20,40,0.18), rgba(0,0,0,0.3)), url('junglesafari.jpg'); background-size:cover;">
+        <div class="overlay"><h4>Jungle Safari</h4><p>Wildlife experiences in Chitwan & Bardiya national parks</p></div>
+      </div>
+      <div class="adventure reveal" style="background-image:linear-gradient(180deg, rgba(5,20,40,0.18), rgba(0,0,0,0.3)), url('rafting.jpg'); background-size:cover;">
+        <div class="overlay"><h4>Rafting</h4><p>White-water action on rivers like Trishuli & Bhote Koshi</p></div>
+      </div>
+    </section>
+
+    <!-- Festivals -->
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin: 12px 0;">
+      <h2 style="color:var(--primary-700); margin:0">Festivals & Events</h2>
+      <a href="festivals.html" class="view-all-link">View All</a>
+    </div>
+
+    <section class="fest-layout reveal" aria-label="Festivals preview" style="margin-bottom:24px;">
+      <div class="fest-feature" style="border-radius:14px; overflow:hidden;">
+        <a href="festivals.html#bisket-jatra" style="text-decoration:none;color:inherit; display:block;">
+          <img src="jatra.jpg.jpg" alt="Bisket Jatra image" loading="lazy">
+          <div class="ff-inner" style="padding:12px;">
+            <div style="flex:1">
+              <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+                <span style="background:var(--accent); color:#fff; padding:6px 10px; border-radius:999px; font-weight:800; font-size:12px;">Featured</span>
+                <span style="font-weight:700; color:var(--muted); font-size:13px;">Bhaktapur</span>
+              </div>
+              <h3 style="margin:0 0 6px 0; color:var(--primary-700);">Bisket Jatra — New Year Chariot Parade</h3>
+              <p style="margin:0; color:var(--muted); max-width:56ch;">Ancient chariot processions, lively crowds and community rituals welcoming the Nepali new year — an immersive cultural highlight.</p>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+              <span style="background:rgba(0,0,0,0.06); padding:8px 12px; border-radius:10px; font-weight:700;">May / April</span>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="fest-grid-right" style="width:340px;">
+        <a href="festivals.html#dashain" class="fest-card" style="min-height:84px; display:flex; align-items:center; padding:8px; gap:12px; background:#fff; color:inherit; border-radius:10px; box-shadow:0 10px 26px rgba(6,16,36,0.06); border:1px solid rgba(0,0,0,0.04);">
+          <img src="dashain1.jpg" alt="Dashain image" style="width:84px; height:64px; object-fit:cover; border-radius:8px;">
+          <div style="flex:1;">
+            <div style="font-weight:800; color:var(--primary-700);">Dashain</div>
+            <div style="color:var(--muted); font-size:13px;">Nationwide — Biggest Hindu festival of Nepal</div>
+          </div>
+          <div style="font-weight:700; color:var(--muted); font-size:12px;">Sep/Oct</div>
+        </a>
+
+        <a href="festivals.html#tihar" class="fest-card" style="min-height:84px; display:flex; align-items:center; padding:8px; gap:12px; background:#fff; color:inherit; border-radius:10px; box-shadow:0 10px 26px rgba(6,16,36,0.06); border:1px solid rgba(0,0,0,0.04);">
+          <img src="tihar.jpg" alt="Tihar image" style="width:84px; height:64px; object-fit:cover; border-radius:8px;">
+          <div style="flex:1;">
+            <div style="font-weight:800; color:var(--primary-700);">Tihar</div>
+            <div style="color:var(--muted); font-size:13px;">Festival of lights — garlands, lamps & cultural rites</div>
+          </div>
+          <div style="font-weight:700; color:var(--muted); font-size:12px;">Oct/Nov</div>
+        </a>
+
+        <a href="festivals.html#holi" class="fest-card" style="min-height:84px; display:flex; align-items:center; padding:8px; gap:12px; background:#fff; color:inherit; border-radius:10px; box-shadow:0 10px 26px rgba(6,16,36,0.06); border:1px solid rgba(0,0,0,0.04);">
+          <img src="holi.jpg" alt="Holi image" style="width:84px; height:64px; object-fit:cover; border-radius:8px;">
+          <div style="flex:1;">
+            <div style="font-weight:800; color:var(--primary-700);">Holi</div>
+            <div style="color:var(--muted); font-size:13px;">Festival of colors — music, dance & street celebrations</div>
+          </div>
+          <div style="font-weight:700; color:var(--muted); font-size:12px;">Mar</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- ====== NEW: Attractive FAQ (centered) ====== -->
+    <div class="qa-reviews reveal" aria-label="FAQs and Site Reviews" style="grid-template-columns:1fr; justify-items:center;">
+      <div class="faq-card" aria-labelledby="faqTitle">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div>
+            <div id="faqTitle" style="font-weight:900; color:var(--primary-700); font-size:1.05rem;">FAQs</div>
+            <div style="color:var(--muted); font-size:0.95rem; margin-top:6px;">Quick answers to common traveler questions about Nepal</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <div class="faq-item" aria-hidden="false">
+            <div class="faq-q" tabindex="0" aria-expanded="false" aria-controls="a1">
+              <h4>When is the best time to visit Nepal?</h4>
+              <div class="faq-arrow" aria-hidden="true">▾</div>
+            </div>
+            <div class="faq-a" id="a1">
+              Spring (March–May) and autumn (September–November) are the most popular: clear mountain views, pleasant trekking weather, and cultural festivals. Winters are cold at altitude; monsoon months bring rain in the lowlands.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" tabindex="0" aria-expanded="false" aria-controls="a2">
+              <h4>Do I need a visa to enter Nepal?</h4>
+              <div class="faq-arrow" aria-hidden="true">▾</div>
+            </div>
+            <div class="faq-a" id="a2">
+              Many nationalities can obtain a tourist visa on arrival at Tribhuvan International Airport and most land crossings. You can also apply online for an e-visa. Check Nepal Immigration for up-to-date details.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" tabindex="0" aria-expanded="false" aria-controls="a3">
+              <h4>Is it safe to trek independently?</h4>
+              <div class="faq-arrow" aria-hidden="true">▾</div>
+            </div>
+            <div class="faq-a" id="a3">
+              Popular trails are well-traveled, but conditions and altitude risks remain. Hiring a registered guide or joining a reputable operator is recommended for safety, permit handling, and local support.
+            </div>
+          </div>
+
+          <div style="margin-top:8px; color:var(--muted); font-size:0.95rem;">
+            Tip: Use <strong>local tourist offices</strong> and official municipality pages for event dates, permits, and current travel advisories.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== UPDATED: Give Rating (styled to match the image) ====== -->
+    <section class="give-rating reveal" aria-label="Give site rating" id="giveRating" style="position:relative;">
+      <!-- title and description -->
+      <h3>Rate your experience</h3>
+      <p class="lead">We highly value your feedback! Kindly take a moment to rate your experience and provide us with your valuable feedback.</p>
+
+      <!-- stars -->
+      <div class="stars" id="siteStars" role="radiogroup" aria-label="Rate site">
+        <button class="rating-star unfilled" data-value="1" aria-label="1 star">★</button>
+        <button class="rating-star unfilled" data-value="2" aria-label="2 stars">★</button>
+        <button class="rating-star unfilled" data-value="3" aria-label="3 stars">★</button>
+        <button class="rating-star unfilled" data-value="4" aria-label="4 stars">★</button>
+        <button class="rating-star unfilled" data-value="5" aria-label="5 stars">★</button>
+      </div>
+
+      <!-- textarea -->
+      <div class="rating-text">
+        <textarea id="ratingComment" placeholder="Tell us about your experience!"></textarea>
+      </div>
+
+      <!-- send button -->
+      <div class="give-controls">
+        <button id="siteSubmit" class="btn-send">Send</button>
+      </div>
+
+      <div class="give-footer" aria-live="polite">
+        <span id="siteCount">No ratings yet</span>
+      </div>
+    </section>
+
+    <!-- (Remaining content unchanged) -->
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer aria-labelledby="footerTitle">
+    <div class="container row">
+      <div style="max-width:520px">
+        <h3 id="footerTitle" style="margin:0 0 8px 0;color:#fff">GoNepal</h3>
+        <small>Designed for KCT Webwar. All rights reserved by BSc.CSIT</small>
+        <div style="margin-top:12px; display:flex; gap:12px; align-items:center">
+          <a href="#" aria-label="Facebook" style="color:#fff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 2h-3a4 4 0 00-4 4v3H8v4h3v8h4v-8h3l1-4h-4V6a1 1 0 011-1h3z" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <a href="#" aria-label="Instagram" style="color:#fff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="#fff" stroke-width="1.2"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17.5 6.5h.01" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+          <a href="#" aria-label="Twitter" style="color:#fff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M23 3a10.9 10.9 0 01-3.14 1.53A4.48 4.48 0 0012 7v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <small>Contact: info@gonepal.example</small><br>
+        <small>Follow us for travel tips & updates</small>
+      </div>
+    </div>
+  </footer>
+
+  <!-- LOGIN / SIGNUP MODAL -->
+  <div id="auth-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="modal-content" role="document">
+      <button class="close" title="Close" aria-label="Close modal" id="modalClose">&times;</button>
+      <div class="form-toggle" role="tablist" aria-label="Authentication">
+        <button id="login-tab" class="active" role="tab" aria-selected="true">Login</button>
+        <button id="signup-tab" role="tab" aria-selected="false">Sign Up</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="login-form" class="auth-form" aria-labelledby="authTitle">
+        <h3 id="authTitle">Welcome back</h3>
+        <input id="loginEmail" type="email" placeholder="Email" required autocomplete="username" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}">
+        <div class="email-error-msg" id="loginEmailError">Please enter a valid email address (e.g., user@example.com)</div>
+        <input id="loginPassword" type="password" placeholder="Password" required autocomplete="current-password">
+        <button type="submit" class="btn-submit">Login</button>
+        <p style="font-size:13px; color:#475569">Don't have an account? <span id="switch-to-signup" style="color:var(--primary-700);cursor:pointer;font-weight:700">Sign Up</span></p>
+      </form>
+
+      <!-- SIGNUP FORM -->
+      <form id="signup-form" class="auth-form" style="display:none;">
+        <h3>Create account</h3>
+        <input id="signupName" type="text" placeholder="Full name" required autocomplete="name">
+        <input id="signupEmail" type="email" placeholder="Email" required autocomplete="email" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}">
+        <div class="email-error-msg" id="signupEmailError">Please enter a valid email address (e.g., user@example.com)</div>
+        <div class="email-success-msg" id="signupEmailSuccess">✓ Email is valid</div>
+        <input id="signupPassword" type="password" placeholder="Password" required autocomplete="new-password">
+        <button type="submit" class="btn-submit">Create account</button>
+        <p style="font-size:13px; color:#475569">Already have an account? <span id="switch-to-login" style="color:var(--primary-700);cursor:pointer;font-weight:700">Login</span></p>
+      </form>
+    </div>
+  </div>
+  
+
+  <!-- Success Popup -->
+  <div id="success-popup" class="popup" role="status" aria-live="polite">Success!</div>
+
+  <script src="script_separated.js"></script>
+</body>
+</html>

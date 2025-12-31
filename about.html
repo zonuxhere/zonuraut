@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Trekking Routes — GoNepal</title>
+  <meta name="description" content="Trekking routes in Nepal: Everest Base Camp, Annapurna Circuit, Langtang and Upper Mustang — route info, hotels, live weather, map and directions." />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    :root{
+      --primary:#004d98;
+      --primary-700:#00386e;
+      --accent:#ffcc33;
+      --muted:#6b7280;
+      --bg: linear-gradient(180deg,#eef6ff 0%,#f3f8ff 100%);
+      --card-shadow: 0 18px 60px rgba(8,24,64,0.08);
+      --radius:14px;
+      --max-width:1180px;
+    }
+    html,body{height:100%;margin:0;font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#071022;background:var(--bg);}
+    .container{max-width:var(--max-width);margin:0 auto;padding:0 20px}
+    a{color:inherit;text-decoration:none}
+
+    /* NAV kept for home reuse but not included on this page */
+    nav{position:fixed;left:0;right:0;top:12px;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;z-index:1400}
+
+    /* HERO */
+    .hero{
+      margin-top:28px;
+      background: linear-gradient(135deg, #063a6b 0%, #072c56 60%);
+      color:#fff;
+      padding:64px 20px;
+      border-radius:18px;
+      box-shadow: var(--card-shadow);
+      margin-bottom:28px;
+    }
+    .hero h1{font-size:2.2rem;margin:0 0 8px}
+    .hero p{opacity:.95;max-width:72ch}
+
+    /* page layout */
+    .section{max-width:var(--max-width);margin:28px auto;padding:0 20px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:14px}
+    .card{background:#fff;border-radius:12px;padding:14px;box-shadow:0 12px 30px rgba(10,20,50,0.06);transition:transform .2s;cursor:pointer;display:flex;flex-direction:column}
+    .card:hover{transform:translateY(-8px)}
+    .card img{width:100%;height:150px;object-fit:cover;border-radius:8px;margin-bottom:10px}
+    .card h3{color:var(--primary-700);margin:6px 0}
+    .card p{color:var(--muted);font-size:.95rem;margin:0 0 8px}
+    .tag{display:inline-block;padding:6px 8px;border-radius:8px;background:linear-gradient(90deg,rgba(0,77,152,0.06),transparent);color:var(--primary-700);font-weight:600;font-size:.85rem}
+
+    /* detail panel */
+    .detail{display:none;margin:30px auto 60px;max-width:1000px;background: linear-gradient(180deg,#fff,#fbfdff);border-radius:14px;padding:22px;box-shadow: var(--card-shadow);border:1px solid rgba(8,30,80,0.04)}
+    .detail.show{display:block}
+    .detail-header{display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .detail-header h2{margin:0;color:var(--primary-700)}
+    .detail-grid{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-top:18px}
+    @media(max-width:980px){ .detail-grid{grid-template-columns:1fr} }
+    .detail-hero img{width:100%;height:380px;object-fit:cover;border-radius:10px;display:block}
+
+    /* widgets */
+    .widget{background:#fff;border-radius:12px;padding:14px;box-shadow:0 10px 28px rgba(6,16,36,0.06);border:1px solid #eef6ff}
+    .widget h4{margin:0 0 8px 0;color:var(--primary-700)}
+    .map{height:240px;border-radius:8px;overflow:hidden}
+    .weather{display:flex;gap:12px;align-items:center}
+    .weather .temp{font-size:2rem;font-weight:800;color:#1f2937}
+    .weather .meta{color:var(--muted)}
+
+    /* hotels */
+    .hotels{display:grid;gap:12px}
+    .hotel{display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid #f2f8ff}
+    .hotel img{width:84px;height:64px;object-fit:cover;border-radius:8px}
+    .hotel .info{flex:1}
+    .hotel .info h5{margin:0;font-size:1rem;color:var(--primary-700)}
+    .hotel .info p{margin:6px 0;color:var(--muted);font-size:.92rem}
+    .cta{display:flex;flex-direction:column;gap:8px}
+    .btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+    .btn-primary{background:linear-gradient(90deg,var(--primary-700),#165fa8);color:#fff}
+    .btn-ghost{background:transparent;border:1px solid rgba(7,18,40,0.06);color:var(--primary-700)}
+
+    .small{font-size:.9rem;color:var(--muted)}
+    .reveal{opacity:0;transform:translateY(8px);transition:all .6s ease}
+    .reveal.visible{opacity:1;transform:none}
+    /* Back button (top-left) */
+    .back-btn{
+      position:fixed;
+      left:18px;
+      top:18px;
+      z-index:1600;
+      background:rgba(255,255,255,0.96);
+      color:var(--primary-700);
+      border-radius:10px;
+      padding:8px 12px;
+      box-shadow:0 8px 24px rgba(8,24,64,0.12);
+      font-weight:700;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .back-btn:hover{transform:translateY(-2px)}
+  </style>
+</head>
+<body>
+
+  <a href="hello_separated.html" class="back-btn" aria-label="Go back to Home">← Go Back</a>
+
+  <!-- intentionally no global nav on this page -->
+
+  <section class="hero container">
+    <h1>Trekking Routes of Nepal</h1>
+    <p>Choose from classic and offbeat treks — route overviews, lodging options, live weather, interactive map and one-click directions and booking.</p>
+  </section>
+
+  <main class="section" id="routes">
+    <h2 style="color:var(--primary-700)">Popular Treks</h2>
+    <p class="small">Tap a route card to view trail highlights, recommended teahouses & lodges, map location and current weather.</p>
+
+    <div class="grid reveal" id="cards">
+      <div class="card" data-id="everest">
+        <img src="everestbase.jpg" alt="Everest Base Camp Trek">
+        <span class="tag">Classic</span>
+        <h3>Everest Base Camp</h3>
+        <p>Iconic high-altitude trek to the foot of the world's highest mountain. Scenic Sherpa villages and Himalayan panorama.</p>
+      </div>
+
+      <div class="card" data-id="annapurna">
+        <img src="annapurna.jpg" alt="Annapurna Circuit">
+        <span class="tag">Circuit</span>
+        <h3>Annapurna Circuit</h3>
+        <p>Varied landscapes from subtropical valleys to alpine passes — cultural stops and hot springs along the way.</p>
+      </div>
+
+      <div class="card" data-id="langtang">
+        <img src="langtang.jpg" alt="Langtang Valley Trek">
+        <span class="tag">Short</span>
+        <h3>Langtang Valley</h3>
+        <p>Accessible mountain valley close to Kathmandu — rhododendron forests, glacial views and Tamang culture.</p>
+      </div>
+
+      <div class="card" data-id="upper_mustang">
+        <img src="uppermustang.jpg" alt="Upper Mustang Trek">
+        <span class="tag">Offbeat</span>
+        <h3>Upper Mustang</h3>
+        <p>Trans-Himalayan desert valley rich in Tibetan Buddhist culture and dramatic rock landscapes.</p>
+      </div>
+    </div>
+
+    <!-- detail panel -->
+    <section class="detail reveal" id="detailPanel" aria-live="polite">
+      <div class="detail-header">
+        <h2 id="detailTitle">Trek</h2>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="btn btn-ghost" id="backBtn">← Back</button>
+          <div class="small" id="shortDesc">Overview</div>
+        </div>
+      </div>
+
+      <div class="detail-grid" style="margin-top:16px">
+        <div>
+          <div class="detail-hero" id="heroImageWrap">
+            <img id="heroImage" src="" alt="">
+          </div>
+
+          <div style="margin-top:16px" id="longDescContainer">
+            <p id="longDesc" style="color:var(--muted)"></p>
+            <ul id="routeFacts" style="color:var(--muted)"></ul>
+          </div>
+
+          <div style="margin-top:18px">
+            <h4 style="margin:0 0 10px 0;color:var(--primary-700)">Teahouses & Lodges</h4>
+            <div class="hotels" id="hotelsList" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <aside>
+          <div class="widget" style="margin-bottom:12px">
+            <h4>Map</h4>
+            <div id="map" class="map"></div>
+            <div class="actions" style="margin-top:10px">
+              <button class="btn btn-ghost" id="openMaps">Open in Google Maps</button>
+              <button class="btn btn-ghost" id="directionsBtn">Directions</button>
+            </div>
+          </div>
+
+          <div class="widget" style="margin-bottom:12px">
+            <h4>Live Weather</h4>
+            <div class="weather" id="weatherWidget">
+              <div class="temp" id="weatherTemp">—</div>
+              <div class="meta">
+                <div id="weatherDesc">—</div>
+                <div id="weatherExtra" style="font-size:.9rem;color:var(--muted)">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="widget">
+            <h4>Quick Info</h4>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+              <div><strong>Duration:</strong> <span id="duration">—</span></div>
+              <div><strong>Max altitude:</strong> <span id="altitude">—</span></div>
+              <div><strong>Difficulty:</strong> <span id="difficulty">—</span></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+  </main>
+
+  <footer style="text-align:center;padding:36px 20px;background:linear-gradient(90deg,var(--primary),var(--primary-700));color:#fff;margin-top:40px">
+    <div class="container">
+      <strong>GoNepal</strong> — Trek Nepal • © <span id="year"></span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // TREKS data
+    const TREKS = {
+      everest: {
+        id:'everest',
+        title:'Everest Base Camp Trek',
+        short:'Classic high-altitude trek to Kala Patthar and EBC with Sherpa culture.',
+        long:'A 12–15 day trek that takes you through Lukla, Namche Bazaar and Tengboche to Everest Base Camp. Expect dramatic glaciers, high passes and vibrant Sherpa villages.',
+        coords:[27.9881,86.9250],
+        image:'everestbasei.jpg',
+        duration:'12–15 days',
+        altitude:'5,364 m (Kala Patthar)',
+        difficulty:'Hard'
+      },
+      annapurna: {
+        id:'annapurna',
+        title:'Annapurna Circuit',
+        short:'A diverse circuit crossing Thorong La with varied ecosystems and mountain views.',
+        long:'Typically 10–18 days depending on start/finish. The route climbs to Thorong La (5,416 m) and passes through terraced farmland, alpine plateaus and Hindu cultural zones.',
+        coords:[28.5983,83.9311],
+        image:'annapurnai.jpg',
+        duration:'10–18 days',
+        altitude:'5,416 m (Thorong La)',
+        difficulty:'Moderate–Hard'
+      },
+      langtang: {
+        id:'langtang',
+        title:'Langtang Valley Trek',
+        short:'Close-to-Kathmandu trek through rhododendron forests and Tamang villages.',
+        long:'A 6–8 day trek ideal for shorter schedules. Easy access from Kathmandu, rich culture, alpine scenery and chance to visit Kyanjing Gompa.',
+        coords:[28.2215,85.5270],
+        image:'lang.jpg',
+        duration:'6–8 days',
+        altitude:'4,984 m (Kyanjin Ri)',
+        difficulty:'Moderate'
+      },
+      upper_mustang: {
+        id:'upper_mustang',
+        title:'Upper Mustang Trek',
+        short:'Ancient Tibetan-influenced kingdom with arid canyons and monasteries.',
+        long:'Permits required. This 8–12 day trek explores the walled capital Lo Manthang, desert-like landscapes and Buddhist caves—an evocative trans-Himalayan experience.',
+        coords:[28.9982,83.8148],
+        image:'upper.jpg',
+        duration:'8–12 days',
+        altitude:'4,000–4,200 m',
+        difficulty:'Moderate–Hard'
+      }
+    };
+
+    // Lodging mockup for treks (teahouses / lodges near trailheads)
+    const LODGES = {
+      everest: [
+        {name:'Namche Teahouse', price:'$18/night', rating:4.3, img:'lodge1.jpg'},
+        {name:'Tengboche Lodge', price:'$25/night', rating:4.5, img:'lodge2.jpg'},
+        {name:'Pangboche Inn', price:'$30/night', rating:4.6, img:'lodge3.jpg'}
+      ],
+      annapurna: [
+        {name:'Besi Sahar Lodge', price:'$20/night', rating:4.1, img:'lodge4.jpg'},
+        {name:'Manang Guesthouse', price:'$28/night', rating:4.5, img:'lodge5.jpg'},
+        {name:'Muktinath Lodge', price:'$35/night', rating:4.7, img:'lodge6.jpg'}
+      ],
+      langtang: [
+        {name:'Syabrubesi Hotel', price:'$22/night', rating:4.2, img:'lodge7.jpg'},
+        {name:'Kyanjin Gompa Lodge', price:'$27/night', rating:4.4, img:'lodge8.jpg'},
+        {name:'Langtang View', price:'$24/night', rating:4.3, img:'lodge9.jpg'}
+      ],
+      upper_mustang: [
+        {name:'Jomsom Caravan', price:'$30/night', rating:4.4, img:'lodge10.jpg'},
+        {name:'Lo Manthang Guest', price:'$40/night', rating:4.6, img:'lodge11.jpg'},
+        {name:'Mustang Retreat', price:'$55/night', rating:4.8, img:'lodge12.jpg'}
+      ]
+    };
+
+    // Preload images
+    Object.values(TREKS).forEach(t => { const i=new Image(); i.src=t.image; });
+
+    const MAPS = {};
+    const detailPanel = document.getElementById('detailPanel');
+    const detailTitle = document.getElementById('detailTitle');
+    const shortDesc = document.getElementById('shortDesc');
+    const heroImage = document.getElementById('heroImage');
+    const longDesc = document.getElementById('longDesc');
+    const routeFacts = document.getElementById('routeFacts');
+    const hotelsList = document.getElementById('hotelsList');
+    const weatherTemp = document.getElementById('weatherTemp');
+    const weatherDesc = document.getElementById('weatherDesc');
+    const weatherExtra = document.getElementById('weatherExtra');
+    const durationEl = document.getElementById('duration');
+    const altitudeEl = document.getElementById('altitude');
+    const difficultyEl = document.getElementById('difficulty');
+    const openMapsBtn = document.getElementById('openMaps');
+    const directionsBtn = document.getElementById('directionsBtn');
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(()=>document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible')),60);
+      document.getElementById('year').innerText = new Date().getFullYear();
+
+      document.querySelectorAll('#cards .card').forEach(c=>{
+        c.addEventListener('click', () => openDetail(c.dataset.id));
+      });
+
+      document.getElementById('backBtn').addEventListener('click', () => {
+        detailPanel.classList.remove('show');
+        window.scrollTo({top:document.getElementById('routes').offsetTop - 20, behavior:'smooth'});
+      });
+    });
+
+    function openDetail(id){
+      const t = TREKS[id];
+      if(!t) return;
+      detailTitle.innerText = t.title;
+      shortDesc.innerText = t.short;
+      heroImage.src = t.image;
+      heroImage.alt = t.title;
+      longDesc.innerText = t.long;
+      durationEl.innerText = t.duration;
+      altitudeEl.innerText = t.altitude;
+      difficultyEl.innerText = t.difficulty;
+
+      // route facts
+      routeFacts.innerHTML = '';
+      const facts = [
+        `Start point: ${routeStartName(id)}`,
+        `Typical days: ${t.duration}`,
+        `Permit: ${requiresPermit(id) ? 'Required' : 'Not required'}`
+      ];
+      facts.forEach(f => {
+        const li = document.createElement('li');
+        li.style.color = 'var(--muted)';
+        li.style.margin = '6px 0';
+        li.innerText = f;
+        routeFacts.appendChild(li);
+      });
+
+      // lodges
+      hotelsList.innerHTML = '';
+      (LODGES[id] || []).forEach(h => {
+        const node = document.createElement('div');
+        node.className = 'hotel';
+        node.innerHTML = `
+          <img src="${h.img}" alt="${h.name}">
+          <div class="info">
+            <h5>${h.name}</h5>
+            <p>${h.price} • ${h.rating} ★</p>
+          </div>
+          <div class="cta">
+            <button class="btn btn-ghost" onclick="viewLodge('${id}','${h.name.replace(/'/g,"\\'")}')">View</button>
+            <button class="btn btn-primary" onclick="bookLodge('${h.name.replace(/'/g,"\\'")}')">Book</button>
+          </div>
+        `;
+        hotelsList.appendChild(node);
+      });
+
+      detailPanel.classList.add('show');
+
+      // map centered on trail coords
+      initMap('map', t.coords, t.title);
+
+      // weather at trailhead (approx)
+      fetchWeather(t.coords);
+
+      // external links
+      openMapsBtn.onclick = () => {
+        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(t.title)}`;
+        window.open(url, '_blank');
+      };
+      directionsBtn.onclick = () => {
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(routeStartName(id))}`;
+        window.open(url, '_blank');
+      };
+
+      setTimeout(()=> detailPanel.scrollIntoView({behavior:'smooth', block:'start'}), 80);
+    }
+
+    function routeStartName(id){
+      if(id==='everest') return 'Lukla, Nepal';
+      if(id==='annapurna') return 'Besisahar, Nepal';
+      if(id==='langtang') return 'Syabrubesi, Nepal';
+      if(id==='upper_mustang') return 'Jomsom, Nepal';
+      return 'Nepal';
+    }
+
+    function requiresPermit(id){
+      return id === 'upper_mustang';
+    }
+
+    function viewLodge(trekId, lodgeName){
+      alert(`${lodgeName} — basic info. Full lodge pages coming soon.`);
+    }
+    function bookLodge(name){
+      alert(`Initiating booking flow for ${name} — demo.`);
+    }
+
+    // map helpers
+    function initMap(containerId, coords, title){
+      const el = document.getElementById(containerId);
+      if(!el) return;
+      if(MAPS[containerId]){
+        try{ MAPS[containerId].setView(coords, 9); MAPS[containerId + '_marker'].setLatLng(coords); } catch(e){}
+        return;
+      }
+      const map = L.map(containerId, {zoomControl:false}).setView(coords, 9);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(map);
+      const marker = L.marker(coords).addTo(map).bindPopup(title).openPopup();
+      MAPS[containerId] = map;
+      MAPS[containerId + '_marker'] = marker;
+      setTimeout(()=> map.invalidateSize(), 300);
+    }
+
+    // weather (Open-Meteo)
+    async function fetchWeather(coords){
+      try{
+        const [lat, lon] = coords;
+        weatherTemp.innerText = '...';
+        weatherDesc.innerText = 'Loading...';
+        weatherExtra.innerText = '';
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&temperature_unit=celsius`;
+        const res = await fetch(url);
+        if(!res.ok) throw new Error('Weather fetch failed');
+        const data = await res.json();
+        if(data && data.current_weather){
+          const cw = data.current_weather;
+          weatherTemp.innerText = `${Math.round(cw.temperature)}°C`;
+          weatherDesc.innerText = mapWeatherCode(cw.weathercode);
+          weatherExtra.innerText = `Wind ${Math.round(cw.windspeed)} km/h • Updated`;
+        } else {
+          weatherTemp.innerText = '—';
+          weatherDesc.innerText = 'No data';
+          weatherExtra.innerText = '';
+        }
+      }catch(err){
+        weatherTemp.innerText = '—';
+        weatherDesc.innerText = 'Weather unavailable';
+        weatherExtra.innerText = '';
+        console.warn(err);
+      }
+    }
+
+    function mapWeatherCode(code){
+      if(code === 0) return 'Clear';
+      if(code === 1 || code === 2 || code === 3) return 'Partly cloudy';
+      if(code >= 45 && code <= 48) return 'Fog';
+      if(code >= 51 && code <= 67) return 'Rain';
+      if(code >= 71 && code <= 86) return 'Snow';
+      if(code >= 95) return 'Thunderstorm';
+      return 'Cloudy';
+    }
+
+    window.addEventListener('resize', ()=> {
+      if(MAPS['map']) MAPS['map'].invalidateSize && MAPS['map'].invalidateSize();
+    });
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Top Destinations — GoNepal</title>
+  <meta name="description" content="Top destinations in Nepal: Kathmandu Valley, Pokhara, Chitwan and Lumbini — maps, hotels, weather and directions." />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    /* Theme vars (kept consistent with home page) */
+    :root{
+      --primary:#004d98;
+      --primary-700:#00386e;
+      --accent:#ffcc33;
+      --muted:#6b7280;
+      --bg: linear-gradient(180deg,#eef6ff 0%,#f3f8ff 100%);
+      --card-shadow: 0 18px 60px rgba(8,24,64,0.08);
+      --radius:14px;
+      --max-width:1180px;
+    }
+
+    html,body{height:100%;margin:0;font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#071022;background:var(--bg);}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:var(--max-width);margin:0 auto;padding:0 20px}
+
+    /* NAV (markup removed on this page; styles kept for reuse on home) */
+    nav{position:fixed;left:0;right:0;top:12px;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;z-index:1400}
+    .logo{display:flex;gap:12px;align-items:center;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:6px 10px;border-radius:10px;box-shadow:0 6px 20px rgba(10,24,60,0.04)}
+    .mark{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary-700));display:grid;place-items:center;color:#fff;font-weight:800}
+    .nav-links{display:flex;gap:14px;align-items:center}
+    .nav-links a{padding:8px 10px;border-radius:8px;font-weight:600;color:var(--muted)}
+    .nav-links a:hover{background:rgba(0,0,0,0.03);color:var(--primary-700)}
+
+    /* HERO */
+    .hero{
+      /* reduced top margin because navbar is removed on this page */
+      margin-top:28px;
+      background: linear-gradient(135deg, #0a3a6f 0%, #09325a 60%);
+      color:#fff;
+      padding:72px 20px;
+      border-radius:18px;
+      box-shadow: var(--card-shadow);
+      margin-bottom:28px;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero h1{font-size:2.4rem;margin:0 0 10px}
+    .hero p{opacity:.95;max-width:68ch}
+
+    /* page layout */
+    .section{max-width:var(--max-width);margin:28px auto;padding:0 20px}
+    .section .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:14px}
+    .card{background:#fff;border-radius:12px;padding:14px;box-shadow:0 12px 30px rgba(10,20,50,0.06);transition:transform .2s;cursor:pointer;display:flex;flex-direction:column}
+    .card:hover{transform:translateY(-8px)}
+    .card h3{color:var(--primary-700);margin:8px 0 6px}
+    .card p{color:var(--muted);font-size:.95rem;margin:0 0 8px}
+
+    /* image inside cards */
+    .card img{
+      width:100%;
+      height:150px;
+      object-fit:cover;
+      border-radius:8px;
+      display:block;
+      margin-bottom:10px;
+    }
+
+    /* detailed view */
+    .detail {
+      display:none;
+      margin:30px auto 60px;
+      max-width:1000px;
+      background: linear-gradient(180deg,#fff,#fbfdff);
+      border-radius:14px;
+      padding:22px;
+      box-shadow: var(--card-shadow);
+      border:1px solid rgba(8,30,80,0.04);
+    }
+    .detail.show{display:block}
+    .detail-header{display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .detail-header h2{margin:0;color:var(--primary-700)}
+    .detail-grid{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-top:18px}
+    @media(max-width:980px){ .detail-grid{grid-template-columns:1fr} }
+
+    .detail-hero{border-radius:10px; overflow:hidden}
+    .detail-hero img{width:100%;height:380px;object-fit:cover;display:block;border-radius:10px}
+
+    /* right column widgets */
+    .widget{background:#fff;border-radius:12px;padding:14px;box-shadow:0 10px 28px rgba(6,16,36,0.06);border:1px solid #eef6ff}
+    .widget h4{margin:0 0 8px 0;color:var(--primary-700)}
+    .map{height:260px;border-radius:8px;overflow:hidden}
+    .weather{display:flex;gap:12px;align-items:center}
+    .weather .temp{font-size:2rem;font-weight:800;color:#1f2937}
+    .weather .meta{color:var(--muted)}
+
+    /* hotels list */
+    .hotels{display:grid;gap:12px}
+    .hotel{display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid #f2f8ff}
+    .hotel img{width:84px;height:64px;object-fit:cover;border-radius:8px}
+    .hotel .info{flex:1}
+    .hotel .info h5{margin:0;font-size:1rem;color:var(--primary-700)}
+    .hotel .info p{margin:6px 0;color:var(--muted);font-size:.92rem}
+    .hotel .cta{display:flex;flex-direction:column;gap:8px}
+    .btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+    .btn-primary{background:linear-gradient(90deg,var(--primary-700),#165fa8);color:#fff}
+    .btn-ghost{background:transparent;border:1px solid rgba(7,18,40,0.06);color:var(--primary-700)}
+
+    /* bottom actions */
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .small{font-size:.9rem;color:var(--muted)}
+
+    /* responsive tweaks */
+    @media(max-width:640px){ .hero h1{font-size:1.6rem} .detail-hero img{height:220px} }
+
+    /* subtle entrance */
+    .reveal{opacity:0;transform:translateY(8px);transition:all .6s ease}
+    .reveal.visible{opacity:1;transform:none}
+    /* Back button (top-left) */
+    .back-btn{
+      position:fixed;
+      left:18px;
+      top:18px;
+      z-index:1600;
+      background:rgba(255,255,255,0.96);
+      color:var(--primary-700);
+      border-radius:10px;
+      padding:8px 12px;
+      box-shadow:0 8px 24px rgba(8,24,64,0.12);
+      font-weight:700;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .back-btn:hover{transform:translateY(-2px)}
+  </style>
+</head>
+<body>
+
+  <a href="hello_separated.html" class="back-btn" aria-label="Go back to Home">← Go Back</a>
+
+  <!-- NAV removed on this page (kept on home) -->
+
+  <!-- HERO -->
+  <section class="hero container">
+    <h1>Top Destinations in Nepal</h1>
+    <p>Explore Kathmandu Valley, Pokhara, Chitwan and Lumbini — maps, live weather, recommended hotels and directions all in one place.</p>
+  </section>
+
+  <main class="section" id="destinations">
+    <h2 style="color:var(--primary-700)">Explore Destinations</h2>
+    <p class="small">Click a card to view details, hotels, map, live weather and directions.</p>
+
+    <div class="grid reveal" id="cards">
+      <div class="card" data-id="kathmandu">
+        <img src="ktm.jpg" alt="Kathmandu Valley">
+        <h3>Kathmandu Valley</h3>
+        <p>Historic temples, Durbar Squares, living heritage and Kathmandu's cultural heart.</p>
+      </div>
+
+      <div class="card" data-id="pokhara">
+        <img src="pokhara.jpg" alt="Pokhara">
+        <h3>Pokhara</h3>
+        <p>Phewa Lake, Annapurna views, paragliding and peaceful lakeside vibes.</p>
+      </div>
+
+      <div class="card" data-id="chitwan">
+        <img src="chitwan1.jpg" alt="Chitwan">
+        <h3>Chitwan</h3>
+        <p>Jungle safaris, wildlife encounters and rich Tharu culture.</p>
+      </div>
+
+      <div class="card" data-id="lumbini">
+        <img src="lumbini.jpg" alt="Lumbini">
+        <h3>Lumbini</h3>
+        <p>Birthplace of Lord Buddha — sacred gardens, monasteries and pilgrimage.</p>
+      </div>
+    </div>
+
+    <!-- DETAILS (one panel used for all destinations) -->
+    <section class="detail reveal" id="detailPanel" aria-live="polite">
+      <div class="detail-header">
+        <h2 id="detailTitle">Destination</h2>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="btn btn-ghost" id="backBtn">← Back</button>
+          <div class="small" id="shortDesc">Overview</div>
+        </div>
+      </div>
+
+      <div class="detail-grid" style="margin-top:16px">
+        <div>
+          <div class="detail-hero" id="heroImageWrap">
+            <img id="heroImage" src="" alt="">
+          </div>
+
+          <div style="margin-top:16px" id="longDescContainer">
+            <p id="longDesc" style="color:var(--muted)"></p>
+          </div>
+
+          <div style="margin-top:18px">
+            <h4 style="margin:0 0 10px 0;color:var(--primary-700)">Hotels & Lodging</h4>
+            <div class="hotels" id="hotelsList" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <aside>
+          <div class="widget" style="margin-bottom:12px">
+            <h4>Map</h4>
+            <div id="map" class="map"></div>
+            <div class="actions" style="margin-top:10px">
+              <button class="btn btn-ghost" id="openMaps">Open in Google Maps</button>
+              <button class="btn btn-ghost" id="directionsBtn">Directions</button>
+            </div>
+          </div>
+
+          <div class="widget" style="margin-bottom:12px">
+            <h4>Live Weather</h4>
+            <div class="weather" id="weatherWidget">
+              <div class="temp" id="weatherTemp">—</div>
+              <div class="meta">
+                <div id="weatherDesc">—</div>
+                <div id="weatherExtra" style="font-size:.9rem;color:var(--muted)">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="widget">
+            <h4>Quick Info</h4>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+              <div><strong>Best time:</strong> <span id="bestTime">—</span></div>
+              <div><strong>Popular activities:</strong> <span id="activities">—</span></div>
+              <div><strong>Distance from Kathmandu:</strong> <span id="distance">—</span></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+  </main>
+
+  <footer style="text-align:center;padding:36px 20px;background:linear-gradient(90deg,var(--primary),var(--primary-700));color:#fff;margin-top:40px">
+    <div class="container">
+      <strong>GoNepal</strong> — Explore Nepal • © <span id="year"></span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Data for destinations (images should exist or be replaced)
+    const DESTINATIONS = {
+      kathmandu: {
+        id: 'kathmandu',
+        title: 'Kathmandu Valley',
+        short: 'Historic temples, Durbar Squares and cultural heritage in the capital valley.',
+        long: 'Kathmandu Valley hosts a remarkable concentration of temples, palaces and living cultural traditions. Explore UNESCO-listed Durbar Squares in Kathmandu, Patan and Bhaktapur, visit Swayambhunath and Boudhanath stupas, and experience bustling markets and traditional Newari architecture.',
+        coords: [27.712,85.3240],
+        image: 'ktmi.jpg',
+        bestTime: 'Sept–Nov & Mar–May',
+        activities: 'Heritage walks, temples, markets',
+        distance: 'N/A'
+      },
+      pokhara: {
+        id: 'pokhara',
+        title: 'Pokhara',
+        short: 'Lakeside town with Annapurna panorama and adventure sports.',
+        long: 'Pokhara is Nepal’s adventure and leisure hub — boat on Phewa Lake, paraglide over the valley, or take short day-treks. It offers spectacular sunrise views of Annapurna and Machapuchare and a relaxed lakeside atmosphere.',
+        coords: [28.2096,83.9856],
+        image: 'pokharanew.jpg',
+        bestTime: 'Sept–Nov & Mar–May',
+        activities: 'Boating, paragliding, trekking',
+        distance: '~200 km from Kathmandu'
+      },
+      chitwan: {
+        id: 'chitwan',
+        title: 'Chitwan National Park',
+        short: 'Wildlife safaris, one-horned rhino and Tharu culture.',
+        long: 'Chitwan is Nepal’s premier national park offering jeep and canoe safaris, guided jungle walks and cultural visits to Tharu villages. This lowland wetland environment is great for wildlife viewing and conservation-focused tourism.',
+        coords: [27.5291,84.3542],
+        image: 'chitwani.jpg',
+        bestTime: 'Oct–March',
+        activities: 'Wildlife safari, birdwatching, canoeing',
+        distance: '~150 km from Kathmandu'
+      },
+      lumbini: {
+        id: 'lumbini',
+        title: 'Lumbini',
+        short: 'Birthplace of Lord Buddha — sacred gardens and monasteries.',
+        long: 'Lumbini is a UNESCO World Heritage site and pilgrimage destination. Visit the Maya Devi Temple, international monasteries and meditation gardens. It’s a peaceful place for reflection and cultural learning.',
+        coords: [27.4845,83.2759],
+        image: 'lumbinii.jpg',
+        bestTime: 'Oct–Mar',
+        activities: 'Pilgrimage, cultural tours',
+        distance: '~260 km from Kathmandu'
+      }
+    };
+
+    // Hotels mock data
+    const HOTELS = {
+      kathmandu: [
+        {name:'Kathmandu Heritage Hotel',price:'$45/night',rating:4.2,img:'ktmheritage.jpg',link:'#'},
+        {name:'Valley Boutique Hotel',price:'$75/night',rating:4.6,img:'valley.jpg',link:'#'},
+        {name:'Durbar Suites',price:'$120/night',rating:4.8,img:'durbar.jpg',link:'#'}
+      ],
+      pokhara: [
+        {name:'Lakeside Retreat',price:'$60/night',rating:4.5,img:'hotel4.jpg',link:'#'},
+        {name:'Annapurna View Lodge',price:'$90/night',rating:4.7,img:'hotel5.jpg',link:'#'},
+        {name:'Phewa Grand',price:'$140/night',rating:4.9,img:'hotel6.jpg',link:'#'}
+      ],
+      chitwan: [
+        {name:'Jungle Safari Lodge',price:'$55/night',rating:4.4,img:'hotel7.jpg',link:'#'},
+        {name:'Tharu Cultural Resort',price:'$80/night',rating:4.6,img:'hotel8.jpg',link:'#'},
+        {name:'Riverfront Camp',price:'$65/night',rating:4.5,img:'hotel9.jpg',link:'#'}
+      ],
+      lumbini: [
+        {name:'Lumbini Garden Hotel',price:'$48/night',rating:4.3,img:'hotel10.jpg',link:'#'},
+        {name:'Pilgrim Comfort Inn',price:'$70/night',rating:4.5,img:'hotel11.jpg',link:'#'},
+        {name:'Meditation Retreat Resort',price:'$120/night',rating:4.8,img:'hotel12.jpg',link:'#'}
+      ]
+    };
+
+    // Preload images (best-effort)
+    Object.values(DESTINATIONS).forEach(d => { const i=new Image(); i.src=d.image; });
+
+    // keep leaflet map instances
+    const MAPS = {};
+
+    // utility - show detail
+    const detailPanel = document.getElementById('detailPanel');
+    const detailTitle = document.getElementById('detailTitle');
+    const shortDesc = document.getElementById('shortDesc');
+    const heroImage = document.getElementById('heroImage');
+    const longDesc = document.getElementById('longDesc');
+    const hotelsList = document.getElementById('hotelsList');
+    const weatherTemp = document.getElementById('weatherTemp');
+    const weatherDesc = document.getElementById('weatherDesc');
+    const weatherExtra = document.getElementById('weatherExtra');
+    const bestTimeEl = document.getElementById('bestTime');
+    const activitiesEl = document.getElementById('activities');
+    const distanceEl = document.getElementById('distance');
+    const openMapsBtn = document.getElementById('openMaps');
+    const directionsBtn = document.getElementById('directionsBtn');
+    let currentDestination = null;
+
+    // initial reveal
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(()=>document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible')),60);
+      document.getElementById('year').innerText = new Date().getFullYear();
+
+      // cards click
+      document.querySelectorAll('#cards .card').forEach(c=>{
+        c.addEventListener('click', () => openDetail(c.dataset.id));
+      });
+
+      document.getElementById('backBtn').addEventListener('click', () => {
+        detailPanel.classList.remove('show');
+        window.scrollTo({top:document.getElementById('destinations').offsetTop - 20, behavior:'smooth'});
+      });
+
+    });
+
+    async function openDetail(id){
+      const d = DESTINATIONS[id];
+      if(!d) return;
+      currentDestination = d;
+      detailTitle.innerText = d.title;
+      shortDesc.innerText = d.short;
+      heroImage.src = d.image;
+      heroImage.alt = d.title;
+      longDesc.innerText = d.long;
+      bestTimeEl.innerText = d.bestTime;
+      activitiesEl.innerText = d.activities;
+      distanceEl.innerText = d.distance;
+      // fill hotels
+      hotelsList.innerHTML = '';
+      (HOTELS[id]||[]).forEach(h => {
+        const node = document.createElement('div');
+        node.className = 'hotel';
+        node.innerHTML = `
+          <img src="${h.img}" alt="${h.name}">
+          <div class="info">
+            <h5>${h.name}</h5>
+            <p>${h.price} • ${h.rating} ★</p>
+          </div>
+          <div class="cta">
+            <button class="btn btn-ghost" onclick="viewHotel('${id}','${h.name.replace(/'/g,"\\'")}')">View</button>
+            <button class="btn btn-primary" onclick="bookHotel('${h.name.replace(/'/g,"\\'")}')">Book</button>
+          </div>
+        `;
+        hotelsList.appendChild(node);
+      });
+
+      detailPanel.classList.add('show');
+      // init map
+      initMap('map', d.coords, d.title);
+      // fetch weather
+      fetchWeather(d.coords);
+
+      // setup external links
+      openMapsBtn.onclick = () => {
+        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.title)}&query_place_id=`;
+        window.open(url, '_blank');
+      };
+      directionsBtn.onclick = () => {
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(d.title)}`;
+        window.open(url, '_blank');
+      };
+
+      // scroll into view
+      setTimeout(()=> detailPanel.scrollIntoView({behavior:'smooth', block:'start'}), 80);
+    }
+
+    function viewHotel(dest, hotelName){
+      alert(`${hotelName} — more details page coming soon.`);
+    }
+    function bookHotel(name){
+      alert(`Booking flow for ${name} — demo only.`);
+    }
+
+    // Map creation / reuse
+    function initMap(containerId, coords, title){
+      // containerId may be 'map' (single right widget)
+      const el = document.getElementById(containerId);
+      if(!el) return;
+      // remove previous map if exists
+      if(MAPS[containerId]){
+        try{ MAPS[containerId].setView(coords, 12); MAPS[containerId + '_marker'].setLatLng(coords); } catch(e){}
+        return;
+      }
+      const map = L.map(containerId, {zoomControl:false}).setView(coords, 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(map);
+      const marker = L.marker(coords).addTo(map).bindPopup(title).openPopup();
+      MAPS[containerId] = map;
+      MAPS[containerId + '_marker'] = marker;
+      // small touch: resize after short delay
+      setTimeout(()=> map.invalidateSize(), 300);
+    }
+
+    // weather via Open-Meteo (no key)
+    async function fetchWeather(coords){
+      try{
+        const [lat, lon] = coords;
+        weatherTemp.innerText = '...';
+        weatherDesc.innerText = 'Loading...';
+        weatherExtra.innerText = '';
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&temperature_unit=celsius`;
+        const res = await fetch(url);
+        if(!res.ok) throw new Error('Weather fetch failed');
+        const data = await res.json();
+        if(data && data.current_weather){
+          const cw = data.current_weather;
+          const t = cw.temperature;
+          const w = cw.windspeed;
+          weatherTemp.innerText = `${Math.round(t)}°C`;
+          weatherDesc.innerText = `${mapWeatherCode(cw.weathercode)}`;
+          weatherExtra.innerText = `Wind ${Math.round(w)} km/h • Updated`;
+        } else {
+          weatherTemp.innerText = '—';
+          weatherDesc.innerText = 'No data';
+          weatherExtra.innerText = '';
+        }
+      }catch(err){
+        weatherTemp.innerText = '—';
+        weatherDesc.innerText = 'Weather unavailable';
+        weatherExtra.innerText = '';
+        console.warn(err);
+      }
+    }
+
+    function mapWeatherCode(code){
+      // simplified mapping
+      if(code === 0) return 'Clear';
+      if(code === 1 || code === 2 || code === 3) return 'Partly cloudy';
+      if(code >= 45 && code <= 48) return 'Fog';
+      if(code >= 51 && code <= 67) return 'Drizzle / Rain';
+      if(code >= 71 && code <= 86) return 'Snow / Sleet';
+      if(code >= 95) return 'Thunderstorm';
+      return 'Cloudy';
+    }
+
+    // small guard: if map container removed, create dynamic
+    window.addEventListener('resize', ()=> {
+      if(MAPS['map']) MAPS['map'].invalidateSize && MAPS['map'].invalidateSize();
+    });
+
+    // helper: create small directions link for each hotel (optional)
+    function hotelDirections(name){
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(name)}`;
+      window.open(url,'_blank');
+    }
+
+  </script>
+</body>
+</html>

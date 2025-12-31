@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nepal Heritages — GoNepal</title>
+  <meta name="description" content="Explore Nepal's heritage sites: Patan Durbar Square, Bhaktapur, Swayambhunath and Pashupatinath — ticketing, map, live weather and directions." />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    :root{
+      --primary:#004d98;
+      --primary-700:#00386e;
+      --muted:#6b7280;
+      --bg: linear-gradient(180deg,#eef6ff 0%,#f3f8ff 100%);
+      --card-shadow: 0 18px 60px rgba(8,24,64,0.08);
+      --max-width:1180px;
+      --radius:12px;
+    }
+
+    html,body{height:100%;margin:0;font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#071022;background:var(--bg);}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:var(--max-width);margin:0 auto;padding:0 20px}
+
+    /* HERO */
+    .hero{
+      margin-top:28px;
+      background: linear-gradient(135deg,#0a3a6f 0%, #09325a 60%);
+      color:#fff;
+      padding:56px 20px;
+      border-radius:18px;
+      box-shadow: var(--card-shadow);
+      margin-bottom:28px;
+      overflow:hidden;
+    }
+    .hero h1{font-size:2rem;margin:0 0 8px}
+    .hero p{opacity:.95;max-width:68ch}
+
+    /* grid */
+    .section{max-width:var(--max-width);margin:28px auto;padding:0 20px}
+    .section .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:14px}
+    .card{background:#fff;border-radius:12px;padding:12px;box-shadow:0 12px 30px rgba(10,20,50,0.06);transition:transform .2s;cursor:pointer;display:flex;flex-direction:column}
+    .card:hover{transform:translateY(-8px)}
+    .card img{width:100%;height:160px;object-fit:cover;border-radius:8px;margin-bottom:10px}
+    .card h3{color:var(--primary-700);margin:6px 0}
+    .card p{color:var(--muted);font-size:.95rem;margin:0 0 8px}
+    .tag{font-size:.8rem;color:var(--muted);background:rgba(0,0,0,0.03);padding:6px 8px;border-radius:8px;display:inline-block}
+
+    /* detail panel */
+    .detail {
+      display:none;
+      margin:30px auto 60px;
+      max-width:1000px;
+      background: linear-gradient(180deg,#fff,#fbfdff);
+      border-radius:14px;
+      padding:22px;
+      box-shadow: var(--card-shadow);
+      border:1px solid rgba(8,30,80,0.04);
+    }
+    .detail.show{display:block}
+    .detail-header{display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .detail-header h2{margin:0;color:var(--primary-700)}
+    .detail-grid{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-top:18px}
+    @media(max-width:980px){ .detail-grid{grid-template-columns:1fr} }
+    .detail-hero img{width:100%;height:380px;object-fit:cover;border-radius:10px;display:block}
+
+    /* widgets */
+    .widget{background:#fff;border-radius:12px;padding:14px;box-shadow:0 10px 28px rgba(6,16,36,0.06);border:1px solid #eef6ff}
+    .widget h4{margin:0 0 8px 0;color:var(--primary-700)}
+    .map{height:240px;border-radius:8px;overflow:hidden}
+    .weather{display:flex;gap:12px;align-items:center}
+    .weather .temp{font-size:2rem;font-weight:800;color:#1f2937}
+    .weather .meta{color:var(--muted)}
+
+    /* ticket booking */
+    .booking{background:#fff;border-radius:12px;padding:14px;box-shadow:0 10px 28px rgba(6,16,36,0.06);border:1px solid #eef6ff}
+    .booking h4{margin:0 0 8px;color:var(--primary-700)}
+    .ticket-row{display:flex;gap:10px;align-items:center;margin-top:10px}
+    .qty{display:flex;align-items:center;gap:8px}
+    .qty button{width:36px;height:36px;border-radius:8px;border:1px solid rgba(7,18,40,0.06);background:transparent;cursor:pointer;font-weight:700}
+    .price{font-weight:800;color:#111;font-size:1.2rem;margin-left:auto}
+    .payment-methods{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .payment-method{padding:10px 12px;border-radius:8px;border:1px solid #eef6ff;background:#fff;cursor:pointer}
+    .payment-method.active{box-shadow:inset 0 0 0 2px rgba(0,77,152,0.08);border-color:var(--primary-700)}
+
+    .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+    .btn-primary{background:linear-gradient(90deg,var(--primary-700),#165fa8);color:#fff}
+    .btn-ghost{background:transparent;border:1px solid rgba(7,18,40,0.06);color:var(--primary-700)}
+
+    .small{font-size:.9rem;color:var(--muted)}
+    .reveal{opacity:0;transform:translateY(8px);transition:all .6s ease}
+    .reveal.visible{opacity:1;transform:none}
+
+    /* Back button (top-left) */
+    .back-btn{
+      position:fixed;
+      left:18px;
+      top:18px;
+      z-index:1600;
+      background:rgba(255,255,255,0.96);
+      color:var(--primary-700);
+      border-radius:10px;
+      padding:8px 12px;
+      box-shadow:0 8px 24px rgba(8,24,64,0.12);
+      font-weight:700;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .back-btn:hover{transform:translateY(-2px)}
+
+    /* login popup */
+    .popup-bg {position: fixed; inset:0; background: rgba(0,0,0,0.55); display: none; align-items:center; justify-content:center; animation: fadeIn 0.25s ease; z-index:1400}
+    .popup-box {background: rgba(255,255,255,0.02); backdrop-filter: blur(8px); padding:26px; width:90%; max-width:420px; text-align:center; border-radius:14px; color:#fff; box-shadow: 0 8px 40px rgba(8,24,64,0.45);}
+    .popup-box h3{margin:0 0 6px}
+    .popup-btn{margin-top:18px;width:100%;padding:12px;background:var(--primary);color:white;border:none;border-radius:10px;font-size:1rem;cursor:pointer}
+  </style>
+</head>
+<body>
+
+  <a href="hello_separated.html" class="back-btn" aria-label="Go back to Home">← Go Back</a>
+
+  <div id="loginPopup" class="popup-bg" aria-hidden="true">
+    <div class="popup-box" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+      <h3 id="loginTitle">Please sign in</h3>
+      <p>Sign in to view and book heritage site tickets.</p>
+      <button class="popup-btn" onclick="redirectToLogin()">Sign in</button>
+    </div>
+  </div>
+
+  <section class="hero container">
+    <h1>Nepal Heritages</h1>
+    <p>Discover and book tickets for Nepal's most treasured heritage sites — live weather, interactive map and easy directions included.</p>
+  </section>
+
+  <main class="section" id="explore">
+    <h2 style="color:var(--primary-700)">Explore Sites</h2>
+    <p class="small">Click a card to open details, view the map, check weather and buy tickets.</p>
+
+    <div class="grid reveal" id="cards">
+      <div class="card" data-id="patan">
+        <img src="patan.jpg" alt="Patan Durbar Square">
+        <h3>Patan Durbar Square</h3>
+        <p>Newar architecture, Krishna Mandir and Patan Museum.</p>
+      </div>
+
+      <div class="card" data-id="bhaktapur">
+        <img src="bds.webp" alt="Bhaktapur Durbar Square">
+        <h3>Bhaktapur Durbar Square</h3>
+        <p>Medieval city, pottery square and 55‑Window Palace.</p>
+      </div>
+
+      <div class="card" data-id="swayambhunath">
+        <img src="swayambhunath.jpg" alt="Swayambhunath Stupa">
+        <h3>Swayambhunath Stupa</h3>
+        <p>Monkey Temple with panoramic valley views.</p>
+      </div>
+
+      <div class="card" data-id="pashupatinath">
+        <img src="pashupatinath.jpg" alt="Pashupatinath Temple">
+        <h3>Pashupatinath Temple</h3>
+        <p>Holiest Hindu temple, ghats and rituals.</p>
+      </div>
+    </div>
+
+    <!-- unified detail panel -->
+    <section class="detail reveal" id="detailPanel" aria-live="polite">
+      <div class="detail-header">
+        <h2 id="detailTitle">Heritage</h2>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="btn btn-ghost" id="backBtn">← Back</button>
+          <div class="small" id="shortDesc">Overview</div>
+        </div>
+      </div>
+
+      <div class="detail-grid" style="margin-top:16px">
+        <div>
+          <div class="detail-hero" id="heroImageWrap">
+            <img id="heroImage" src="" alt="">
+          </div>
+
+          <div style="margin-top:16px" id="longDescContainer">
+            <p id="longDesc" style="color:var(--muted)"></p>
+          </div>
+
+          <div style="margin-top:18px" class="booking">
+            <h4>Book Tickets</h4>
+            <div style="margin-top:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+              <div>
+                <div class="small">Ticket price</div>
+                <div id="ticketPrice" style="font-weight:800;font-size:1.1rem">—</div>
+              </div>
+
+              <div class="qty" style="margin-left:10px">
+                <div class="small">Quantity</div>
+                <div style="display:flex;align-items:center;gap:6px;margin-left:6px">
+                  <button onclick="changeQty(-1)">−</button>
+                  <div id="qty" style="min-width:28px;text-align:center">1</div>
+                  <button onclick="changeQty(1)">+</button>
+                </div>
+              </div>
+
+              <div class="price" id="totalPrice">—</div>
+            </div>
+
+            <div class="small" style="margin-top:12px">Select payment</div>
+            <div class="payment-methods" id="paymentMethods">
+              <div class="payment-method" onclick="selectPayment(this)">Credit Card</div>
+              <div class="payment-method" onclick="selectPayment(this)">Khalti</div>
+              <div class="payment-method" onclick="selectPayment(this)">PayPal</div>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+              <button class="btn btn-primary" onclick="buyNow()" id="buyNowBtn">Buy Now</button>
+              <button class="btn btn-ghost" onclick="addToCart()" id="addCartBtn">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <aside>
+          <div class="widget" style="margin-bottom:12px">
+            <h4>Map</h4>
+            <div id="map" class="map"></div>
+            <div class="actions" style="margin-top:10px;display:flex;gap:8px">
+              <button class="btn btn-ghost" id="openMaps">Open in Google Maps</button>
+              <button class="btn btn-ghost" id="directionsBtn">Directions</button>
+            </div>
+          </div>
+
+          <div class="widget" style="margin-bottom:12px">
+            <h4>Live Weather</h4>
+            <div class="weather" id="weatherWidget">
+              <div class="temp" id="weatherTemp">—</div>
+              <div class="meta">
+                <div id="weatherDesc">—</div>
+                <div id="weatherExtra" style="font-size:.9rem;color:var(--muted)">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="widget">
+            <h4>Quick Info</h4>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+              <div><strong>Opening hours:</strong> <span id="hours">—</span></div>
+              <div><strong>Recommended visit:</strong> <span id="recommended">—</span></div>
+              <div><strong>Distance from Kathmandu:</strong> <span id="distance">—</span></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+  </main>
+
+  <footer style="text-align:center;padding:36px 20px;background:linear-gradient(90deg,var(--primary),var(--primary-700));color:#fff;margin-top:40px">
+    <div class="container">
+      <strong>GoNepal</strong> — Heritage Tickets • © <span id="year"></span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Heritage dataset
+    const HERITAGES = {
+      patan: {
+        id:'patan',
+        title:'Patan Durbar Square',
+        short:'Newar architecture and Patan Museum',
+        long: `Patan Durbar Square in Lalitpur is famed for its artistic courtyards, Krishna Mandir and centuries-old Newari craftsmanship. A UNESCO site, ideal for cultural exploration and photography.`,
+        coords:[27.6725,85.3206],
+        image:'patani.jpg',
+        price:1500, // NPR
+        hours:'06:00 – 18:00',
+        recommended:'1–2 hours',
+        distance:'Within Kathmandu Valley'
+      },
+      bhaktapur: {
+        id:'bhaktapur',
+        title:'Bhaktapur Durbar Square',
+        short:'Medieval city with pottery and palaces',
+        long: `Bhaktapur Durbar Square is an exceptional example of Newar architecture — home to the 55-Window Palace, Vatsala Temple and rich handicraft traditions.`,
+        coords:[27.6710,85.4293],
+        image:'bhaktapuri.jpg',
+        price:1500,
+        hours:'06:00 – 18:00',
+        recommended:'2–3 hours',
+        distance:'~13 km from Kathmandu'
+      },
+      swayambhunath: {
+        id:'swayambhunath',
+        title:'Swayambhunath Stupa',
+        short:'Monkey Temple with valley views',
+        long: `Swayambhunath, perched on a hill, offers panoramic views of Kathmandu Valley and is a spiritual center for Buddhists and Hindus alike.`,
+        coords:[27.7149,85.2900],
+        image:'swayambhunathi.jpg',
+        price:1500,
+        hours:'All day (visiting hours vary)',
+        recommended:'1–1.5 hours',
+        distance:'Within Kathmandu Valley'
+      },
+      pashupatinath: {
+        id:'pashupatinath',
+        title:'Pashupatinath Temple',
+        short:'Sacred Hindu temple on Bagmati River',
+        long: `Pashupatinath is Nepal's most significant Hindu temple complex dedicated to Lord Shiva, known for its ritual ghats and ceremonies.`,
+        coords:[27.7100,85.3240],
+        image:'pashupatinathi.jpg',
+        price:1500,
+        hours:'04:00 – 19:00',
+        recommended:'1–2 hours',
+        distance:'Within Kathmandu Valley'
+      }
+    };
+
+    // state
+    let current = null;
+    let qty = 1;
+    let selectedPayment = null;
+    const MAPS = {};
+
+    // DOM refs
+    const detailPanel = document.getElementById('detailPanel');
+    const detailTitle = document.getElementById('detailTitle');
+    const shortDesc = document.getElementById('shortDesc');
+    const heroImage = document.getElementById('heroImage');
+    const longDesc = document.getElementById('longDesc');
+    const ticketPriceEl = document.getElementById('ticketPrice');
+    const qtyEl = document.getElementById('qty');
+    const totalPriceEl = document.getElementById('totalPrice');
+    const paymentMethodsRoot = document.getElementById('paymentMethods');
+    const openMapsBtn = document.getElementById('openMaps');
+    const directionsBtn = document.getElementById('directionsBtn');
+    const weatherTemp = document.getElementById('weatherTemp');
+    const weatherDesc = document.getElementById('weatherDesc');
+    const weatherExtra = document.getElementById('weatherExtra');
+    const hoursEl = document.getElementById('hours');
+    const recEl = document.getElementById('recommended');
+    const distEl = document.getElementById('distance');
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(()=>document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible')),60);
+      document.getElementById('year').innerText = new Date().getFullYear();
+
+      // card clicks
+      document.querySelectorAll('#cards .card').forEach(c=>{
+        c.addEventListener('click', () => openDetail(c.dataset.id));
+      });
+
+      document.getElementById('backBtn').addEventListener('click', () => {
+        detailPanel.classList.remove('show');
+        window.scrollTo({top:document.getElementById('explore').offsetTop - 20, behavior:'smooth'});
+      });
+
+      // login check (demo)
+      if(localStorage.getItem('loggedIn') !== 'true'){
+        document.getElementById('loginPopup').style.display = 'flex';
+        document.getElementById('loginPopup').setAttribute('aria-hidden','false');
+      }
+    });
+
+    function redirectToLogin(){
+      // demo: mark logged in to allow viewing without real auth
+      localStorage.setItem('loggedIn','true');
+      document.getElementById('loginPopup').style.display='none';
+      document.getElementById('loginPopup').setAttribute('aria-hidden','true');
+    }
+
+    function openDetail(id){
+      if(localStorage.getItem('loggedIn') !== 'true'){
+        document.getElementById('loginPopup').style.display='flex';
+        document.getElementById('loginPopup').setAttribute('aria-hidden','false');
+        return;
+      }
+
+      const h = HERITAGES[id];
+      if(!h) return;
+      current = h;
+      qty = 1;
+      selectedPayment = null;
+      detailTitle.innerText = h.title;
+      shortDesc.innerText = h.short;
+      heroImage.src = h.image;
+      heroImage.alt = h.title;
+      longDesc.innerText = h.long;
+      ticketPriceEl.innerText = `${h.price} NPR`;
+      qtyEl.innerText = qty;
+      totalPriceEl.innerText = `${h.price * qty} NPR`;
+      hoursEl.innerText = h.hours;
+      recEl.innerText = h.recommended;
+      distEl.innerText = h.distance;
+
+      // clear payment selection
+      paymentMethodsRoot.querySelectorAll('.payment-method').forEach(pm => pm.classList.remove('active'));
+
+      detailPanel.classList.add('show');
+
+      // init map & weather
+      initMap('map', h.coords, h.title);
+      fetchWeather(h.coords);
+
+      // external links
+      openMapsBtn.onclick = ()=> {
+        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.title)}`;
+        window.open(url,'_blank');
+      };
+      directionsBtn.onclick = ()=> {
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(h.title)}`;
+        window.open(url,'_blank');
+      };
+
+      setTimeout(()=> detailPanel.scrollIntoView({behavior:'smooth', block:'start'}),80);
+    }
+
+    function changeQty(delta){
+      qty = Math.max(1, qty + delta);
+      qtyEl.innerText = qty;
+      totalPriceEl.innerText = `${current.price * qty} NPR`;
+    }
+
+    function selectPayment(el){
+      paymentMethodsRoot.querySelectorAll('.payment-method').forEach(pm=>pm.classList.remove('active'));
+      el.classList.add('active');
+      selectedPayment = el.innerText.trim();
+    }
+
+    function addToCart(){
+      if(!current){ alert('Select a site first'); return; }
+      showToast(`${qty} ticket(s) for ${current.title} added to cart.`);
+    }
+
+    function buyNow(){
+      if(!current){ alert('Select a site first'); return; }
+      if(!selectedPayment){ showToast('Please select a payment method.'); return; }
+      // Demo purchase flow
+      showToast(`Purchased ${qty} ticket(s) for ${current.title} via ${selectedPayment}.`);
+    }
+
+    function showToast(msg){
+      const el = document.createElement('div');
+      el.style.position='fixed';
+      el.style.bottom='20px';
+      el.style.left='50%';
+      el.style.transform='translateX(-50%)';
+      el.style.background='rgba(7,18,40,0.9)';
+      el.style.color='#fff';
+      el.style.padding='12px 18px';
+      el.style.borderRadius='10px';
+      el.style.boxShadow='0 8px 30px rgba(8,24,64,0.4)';
+      el.style.zIndex=1600;
+      el.innerText = msg;
+      document.body.appendChild(el);
+      setTimeout(()=>{ el.style.opacity='0'; setTimeout(()=>el.remove(),300) }, 2200);
+    }
+
+    // Map creation / reuse
+    function initMap(containerId, coords, title){
+      const el = document.getElementById(containerId);
+      if(!el) return;
+      // reuse single map instance
+      if(MAPS[containerId]){
+        try {
+          MAPS[containerId].setView(coords, 15);
+          MAPS[containerId + '_marker'].setLatLng(coords);
+        } catch(e){}
+        return;
+      }
+      const map = L.map(containerId, {zoomControl:false}).setView(coords, 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(map);
+      const marker = L.marker(coords).addTo(map).bindPopup(title).openPopup();
+      MAPS[containerId] = map;
+      MAPS[containerId + '_marker'] = marker;
+      setTimeout(()=> map.invalidateSize(), 300);
+    }
+
+    // weather via Open-Meteo
+    async function fetchWeather(coords){
+      try{
+        const [lat, lon] = coords;
+        weatherTemp.innerText = '...';
+        weatherDesc.innerText = 'Loading...';
+        weatherExtra.innerText = '';
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&temperature_unit=celsius`;
+        const res = await fetch(url);
+        if(!res.ok) throw new Error('Weather fetch failed');
+        const data = await res.json();
+        if(data && data.current_weather){
+          const cw = data.current_weather;
+          const t = cw.temperature;
+          const w = cw.windspeed;
+          weatherTemp.innerText = `${Math.round(t)}°C`;
+          weatherDesc.innerText = mapWeatherCode(cw.weathercode);
+          weatherExtra.innerText = `Wind ${Math.round(w)} km/h • Updated`;
+        } else {
+          weatherTemp.innerText = '—';
+          weatherDesc.innerText = 'No data';
+          weatherExtra.innerText = '';
+        }
+      } catch(err){
+        weatherTemp.innerText = '—';
+        weatherDesc.innerText = 'Weather unavailable';
+        weatherExtra.innerText = '';
+        console.warn(err);
+      }
+    }
+
+    function mapWeatherCode(code){
+      if(code === 0) return 'Clear';
+      if(code === 1 || code === 2 || code === 3) return 'Partly cloudy';
+      if(code >= 45 && code <= 48) return 'Fog';
+      if(code >= 51 && code <= 67) return 'Rain';
+      if(code >= 71 && code <= 86) return 'Snow';
+      if(code >= 95) return 'Thunderstorm';
+      return 'Cloudy';
+    }
+
+    // small guard
+    window.addEventListener('resize', ()=> {
+      if(MAPS['map']) MAPS['map'].invalidateSize && MAPS['map'].invalidateSize();
+    });
+
+  </script>
+</body>
+</html>
